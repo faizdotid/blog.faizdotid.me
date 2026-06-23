@@ -1,125 +1,382 @@
 /*
-  The CSS in this style tag is based off of Bear Blog's default CSS.
-  https://github.com/HermanMartinus/bearblog/blob/297026a877bc2ab2b3bdfbd6b9f7961c350917dd/templates/styles/blog/default.css
-  License MIT: https://github.com/HermanMartinus/bearblog/blob/master/LICENSE.md
- */
+  Design system for faizdotid's blog.
+  Monochrome, dark-first aesthetic that mirrors faizdotid.me.
+*/
 
+/* ------------------------------------------------------------------ */
+/* Design tokens                                                       */
+/* ------------------------------------------------------------------ */
 :root {
-	--accent: #2337ff;
-	--accent-dark: #000d8a;
-	--black: 15, 18, 25;
-	--gray: 96, 115, 159;
-	--gray-light: 229, 233, 240;
-	--gray-dark: 34, 41, 57;
-	--gray-gradient: rgba(var(--gray-light), 50%), #fff;
-	--box-shadow:
-		0 2px 6px rgba(var(--gray), 25%), 0 8px 24px rgba(var(--gray), 33%),
-		0 16px 32px rgba(var(--gray), 33%);
+	/* Type */
+	--font-body: var(--font-sans), system-ui, sans-serif;
+	--font-display: var(--font-grotesk), system-ui, sans-serif;
+	--font-code: var(--font-mono), ui-monospace, monospace;
+
+	/* Modular scale (1.25 — major third) */
+	--step--1: clamp(0.83rem, 0.81rem + 0.1vw, 0.89rem);
+	--step-0: clamp(1rem, 0.96rem + 0.2vw, 1.13rem);
+	--step-1: clamp(1.25rem, 1.18rem + 0.34vw, 1.41rem);
+	--step-2: clamp(1.56rem, 1.45rem + 0.56vw, 1.76rem);
+	--step-3: clamp(1.95rem, 1.77rem + 0.9vw, 2.2rem);
+	--step-4: clamp(2.44rem, 2.16rem + 1.4vw, 2.75rem);
+	--step-5: clamp(3.05rem, 2.62rem + 2.16vw, 3.43rem);
+
+	/* Spacing & radius */
+	--radius: 10px;
+	--radius-sm: 6px;
+	--content-width: 720px;
+	--wide-width: 1080px;
+
+	/* Dark palette (default — matches faizdotid.me) */
+	--bg: #0f0f0f;
+	--bg-soft: #151515;
+	--surface: #161616;
+	--surface-2: #1d1d1d;
+	--border: #2a2a2a;
+	--text: #f5f5f0;
+	--text-soft: #a0a0a0;
+	--text-muted: #888888;
+	--accent: #f5f5f0;
+	--accent-hover: #a0a0a0;
+	--accent-soft: #1d1d1d;
+	--accent-contrast: #0f0f0f;
+	--code-bg: #1a1a1a;
+
+	--shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.4);
+	--shadow-md: 0 4px 12px rgba(0, 0, 0, 0.45), 0 12px 32px rgba(0, 0, 0, 0.35);
+	--shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.55), 0 24px 60px rgba(0, 0, 0, 0.45);
+
+	--header-bg: rgba(15, 15, 15, 0.72);
+
+	/* Shiki code highlighting — monochrome, derived from the theme tokens
+	   above so it adapts to light/dark automatically. */
+	--astro-code-foreground: var(--text-soft);
+	--astro-code-background: var(--code-bg);
+	--astro-code-token-constant: var(--text);
+	--astro-code-token-string: var(--text-soft);
+	--astro-code-token-comment: var(--text-muted);
+	--astro-code-token-keyword: var(--text);
+	--astro-code-token-parameter: var(--text-soft);
+	--astro-code-token-function: var(--text);
+	--astro-code-token-string-expression: var(--text-soft);
+	--astro-code-token-punctuation: var(--text-muted);
+	--astro-code-token-link: var(--text);
+
+	color-scheme: dark;
 }
+
+:root[data-theme='light'] {
+	--bg: #f5f5f0;
+	--bg-soft: #ecece6;
+	--surface: #ffffff;
+	--surface-2: #f0f0ea;
+	--border: #e2e2da;
+	--text: #0f0f0f;
+	--text-soft: #444444;
+	--text-muted: #888888;
+	--accent: #0f0f0f;
+	--accent-hover: #444444;
+	--accent-soft: #ecece6;
+	--accent-contrast: #f5f5f0;
+	--code-bg: #ecece6;
+
+	--shadow-sm: 0 1px 2px rgba(15, 15, 15, 0.06), 0 1px 1px rgba(15, 15, 15, 0.04);
+	--shadow-md:
+		0 4px 12px rgba(15, 15, 15, 0.07), 0 12px 32px rgba(15, 15, 15, 0.06);
+	--shadow-lg:
+		0 8px 24px rgba(15, 15, 15, 0.1), 0 24px 60px rgba(15, 15, 15, 0.1);
+
+	--header-bg: rgba(245, 245, 240, 0.75);
+
+	color-scheme: light;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reset & base                                                        */
+/* ------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+	box-sizing: border-box;
+}
+
+html {
+	-webkit-text-size-adjust: 100%;
+	scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	html {
+		scroll-behavior: auto;
+	}
+	*,
+	*::before,
+	*::after {
+		animation-duration: 0.001ms !important;
+		transition-duration: 0.001ms !important;
+	}
+}
+
 body {
-	font-family: var(--font-atkinson);
 	margin: 0;
 	padding: 0;
-	text-align: left;
-	background: linear-gradient(var(--gray-gradient)) no-repeat;
-	background-size: 100% 600px;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	font-family: var(--font-body);
+	font-size: var(--step-0);
+	font-weight: 400;
+	line-height: 1.7;
+	color: var(--text-soft);
+	background-color: var(--bg);
 	word-wrap: break-word;
 	overflow-wrap: break-word;
-	color: rgb(var(--gray-dark));
-	font-size: 20px;
-	line-height: 1.7;
+	-webkit-font-smoothing: antialiased;
+	text-rendering: optimizeLegibility;
+	transition: background-color 0.3s ease, color 0.3s ease;
 }
+
 main {
-	width: 720px;
-	max-width: calc(100% - 2em);
-	margin: auto;
-	padding: 3em 1em;
+	flex: 1 0 auto;
+	width: var(--content-width);
+	max-width: calc(100% - 2.5rem);
+	margin-inline: auto;
+	padding: 3.5rem 0 4rem;
 }
+/* Wider container for index/listing pages. */
+main.wide {
+	width: var(--wide-width);
+}
+/* Edge-to-edge: the page manages its own inner widths (e.g. blog posts). */
+main.full {
+	width: 100%;
+	max-width: 100%;
+	margin: 0;
+	padding: 0;
+}
+
+/* ------------------------------------------------------------------ */
+/* Typography                                                          */
+/* ------------------------------------------------------------------ */
 h1,
 h2,
 h3,
 h4,
 h5,
 h6 {
-	margin: 0 0 0.5rem 0;
-	color: rgb(var(--black));
-	line-height: 1.2;
+	margin: 0 0 0.5rem;
+	font-family: var(--font-display);
+	font-weight: 500;
+	line-height: 1.15;
+	letter-spacing: -0.03em;
+	color: var(--text);
+	text-wrap: balance;
 }
+
 h1 {
-	font-size: 3.052em;
+	font-size: var(--step-5);
+	font-weight: 500;
 }
 h2 {
-	font-size: 2.441em;
+	font-size: var(--step-4);
+	margin-top: 2.5rem;
 }
 h3 {
-	font-size: 1.953em;
+	font-size: var(--step-3);
+	margin-top: 2rem;
 }
 h4 {
-	font-size: 1.563em;
+	font-size: var(--step-2);
 }
 h5 {
-	font-size: 1.25em;
+	font-size: var(--step-1);
 }
+h6 {
+	font-size: var(--step-0);
+}
+
+p {
+	margin: 0 0 1.25rem;
+}
+
 strong,
 b {
-	font-weight: 700;
+	font-weight: 600;
+	color: var(--text);
 }
+
 a {
 	color: var(--accent);
+	text-decoration-color: var(--text-muted);
+	text-underline-offset: 0.18em;
+	text-decoration-thickness: 0.07em;
+	transition: color 0.18s ease, text-decoration-color 0.18s ease;
 }
+
 a:hover {
-	color: var(--accent);
+	color: var(--accent-hover);
+	text-decoration-color: currentColor;
 }
-p {
-	margin-bottom: 1em;
+
+/* Visible focus ring for keyboard users; hidden for mouse/touch. */
+:focus-visible {
+	outline: 2px solid var(--accent);
+	outline-offset: 3px;
 }
-.prose p {
-	margin-bottom: 2em;
+:focus:not(:focus-visible) {
+	outline: none;
+}
+
+ul,
+ol {
+	padding-left: 1.3em;
+}
+
+li {
+	margin-bottom: 0.4em;
+}
+
+small {
+	font-size: var(--step--1);
+	color: var(--text-muted);
+}
+
+textarea,
+input {
+	font-family: inherit;
+	font-size: 1rem;
 }
 textarea {
 	width: 100%;
-	font-size: 16px;
 }
-input {
-	font-size: 16px;
-}
+
 table {
 	width: 100%;
+	border-collapse: collapse;
 }
+th,
+td {
+	padding: 0.6em 0.8em;
+	border-bottom: 1px solid var(--border);
+	text-align: left;
+}
+
 img {
 	max-width: 100%;
 	height: auto;
-	border-radius: 8px;
+	border-radius: var(--radius);
 }
+
+/* Code */
 code {
-	padding: 2px 5px;
-	background-color: rgb(var(--gray-light));
-	border-radius: 2px;
+	font-family: var(--font-code);
+	font-size: 0.88em;
+	padding: 0.15em 0.4em;
+	background-color: var(--code-bg);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
 }
+
 pre {
-	padding: 1.5em;
-	border-radius: 8px;
+	padding: 1.25em 1.5em;
+	border-radius: var(--radius);
+	border: 1px solid var(--border);
+	box-shadow: var(--shadow-sm);
+	overflow-x: auto;
 }
 pre > code {
 	all: unset;
+	font-family: var(--font-code);
 }
+
 blockquote {
-	border-left: 4px solid var(--accent);
-	padding: 0 0 0 20px;
-	margin: 0;
-	font-size: 1.333em;
+	margin: 1.75rem 0;
+	padding: 0.4rem 0 0.4rem 1.5rem;
+	border-left: 2px solid var(--text-muted);
+	font-family: var(--font-display);
+	font-size: var(--step-1);
+	font-weight: 300;
+	color: var(--text);
 }
+
 hr {
+	margin: 2.5rem 0;
 	border: none;
-	border-top: 1px solid rgb(var(--gray-light));
+	border-top: 1px solid var(--border);
 }
-@media (max-width: 720px) {
-	body {
-		font-size: 18px;
-	}
-	main {
-		padding: 1em;
-	}
+
+::selection {
+	background: var(--text);
+	color: var(--bg);
+}
+
+/* ------------------------------------------------------------------ */
+/* Shared utilities                                                    */
+/* ------------------------------------------------------------------ */
+.eyebrow {
+	display: inline-block;
+	font-family: var(--font-body);
+	font-size: var(--step--1);
+	font-weight: 500;
+	letter-spacing: 0.14em;
+	text-transform: uppercase;
+	color: var(--text-muted);
+}
+
+.btn {
+	display: inline-flex;
+	align-items: center;
+	gap: 0.5em;
+	padding: 0.7em 1.4em;
+	font-family: var(--font-body);
+	font-weight: 500;
+	font-size: var(--step-0);
+	line-height: 1;
+	border-radius: 999px;
+	border: 1px solid transparent;
+	text-decoration: none;
+	cursor: pointer;
+	transition: transform 0.18s cubic-bezier(0.23, 1, 0.32, 1),
+		background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+.btn-primary {
+	background: var(--accent);
+	color: var(--accent-contrast);
+}
+.btn-primary:hover {
+	color: var(--accent-contrast);
+	transform: translateY(-2px);
+	opacity: 0.88;
+}
+.btn-ghost {
+	background: transparent;
+	color: var(--text);
+	border-color: var(--border);
+}
+.btn-ghost:hover {
+	color: var(--text);
+	border-color: var(--text);
+	transform: translateY(-2px);
+}
+
+/* Round icon button used in the header and search trigger. */
+.icon-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	height: 38px;
+	border-radius: 999px;
+	border: 1px solid transparent;
+	background: transparent;
+	color: var(--text-soft);
+	cursor: pointer;
+	transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+.icon-btn:hover {
+	color: var(--text);
+	background: var(--surface-2);
+	border-color: var(--border);
 }
 
 .sr-only {
@@ -130,12 +387,13 @@ hr {
 	height: 1px;
 	width: 1px;
 	overflow: hidden;
-	/* IE6, IE7 - a 0 height clip, off to the bottom right of the visible 1px box */
-	clip: rect(1px 1px 1px 1px);
-	/* maybe deprecated but we need to support legacy browsers */
 	clip: rect(1px, 1px, 1px, 1px);
-	/* modern browsers, clip-path works inwards from each corner */
 	clip-path: inset(50%);
-	/* added line to stop words getting smushed together (as they go onto separate lines and some screen readers do not understand line feeds as a space */
 	white-space: nowrap;
+}
+
+@media (max-width: 720px) {
+	main {
+		padding: 2.5rem 0 3rem;
+	}
 }

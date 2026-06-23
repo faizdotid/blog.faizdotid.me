@@ -1,0 +1,93 @@
+---
+import type { GetStaticPaths } from "astro";
+import BaseLayout from "../../components/BaseLayout.astro";
+import PostCard from "../../components/PostCard.astro";
+import { getAllTags, getPosts, slugifyTag } from "../../utils/tags";
+
+export const getStaticPaths = (async () => {
+  const [posts, tags] = await Promise.all([getPosts(), getAllTags()]);
+
+  return tags.map(({ tag, slug }) => ({
+    params: { tag: slug },
+    props: {
+      tag,
+      posts: posts.filter((post) =>
+        post.data.tags.some((t) => slugifyTag(t) === slug),
+      ),
+    },
+  }));
+}) satisfies GetStaticPaths;
+
+const { tag, posts } = Astro.props;
+const count = posts.length;
+---
+
+<BaseLayout
+  title={`#${tag.toLowerCase()}`}
+  description={`Posts tagged “${tag.toLowerCase()}”.`}
+  width="wide"
+>
+  <header class="page-head">
+    <a class="back-link" href="/tags">
+      <svg
+        viewBox="0 0 24 24"
+        width="16"
+        height="16"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2.4"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        aria-hidden="true"><path d="M19 12H5M11 18l-6-6 6-6"></path></svg
+      >
+      All tags
+    </a>
+    <h1>#{tag.toLowerCase()}</h1>
+    <p>{count} {count === 1 ? "post" : "posts"} tagged with this.</p>
+  </header>
+
+  <ul class="grid">
+    {
+      posts.map((post) => (
+        <li>
+          <PostCard post={post} />
+        </li>
+      ))
+    }
+  </ul>
+</BaseLayout>
+
+<style>
+  .page-head {
+    margin-bottom: 2.5rem;
+  }
+  .back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-size: var(--step--1);
+    font-weight: 600;
+    color: var(--text-muted);
+    text-decoration: none;
+    margin-bottom: 1.2rem;
+  }
+  .back-link:hover {
+    color: var(--accent);
+  }
+  .page-head h1 {
+    margin: 0 0 0.4rem;
+  }
+  .page-head p {
+    margin: 0;
+    color: var(--text-soft);
+    font-size: var(--step-1);
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2.5rem 2rem;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+</style>

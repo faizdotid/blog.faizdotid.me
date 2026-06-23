@@ -1,0 +1,31 @@
+---
+import type { ImageMetadata } from "astro";
+import BaseHead from "./BaseHead.astro";
+import Header from "./Header.astro";
+import Footer from "./Footer.astro";
+
+interface Props {
+  title: string;
+  description: string;
+  image?: ImageMetadata;
+  /** Controls the width of <main>. See `main` rules in global.css. */
+  width?: "default" | "wide" | "full";
+}
+
+const { title, description, image, width = "default" } = Astro.props;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <BaseHead title={title} description={description} image={image} />
+    <slot name="head" />
+  </head>
+  <body>
+    <Header />
+    <main class:list={[{ wide: width === "wide", full: width === "full" }]}>
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

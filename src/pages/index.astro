@@ -1,49 +1,179 @@
 ---
-import BaseHead from '../components/BaseHead.astro';
-import Footer from '../components/Footer.astro';
-import Header from '../components/Header.astro';
-import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import BaseLayout from "../components/BaseLayout.astro";
+import FormattedDate from "../components/FormattedDate.astro";
+import { HOME_TITLE, SITE_DESCRIPTION } from "../consts";
+
+const posts = (await getCollection("blog")).sort(
+  (a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+const latest = posts.slice(0, 3);
 ---
 
-<!doctype html>
-<html lang="en">
-	<head>
-		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
-	</head>
-	<body>
-		<Header />
-		<main>
-			<h1>🧑‍🚀 Hello, Astronaut!</h1>
-			<p>
-				Welcome to the official <a href="https://astro.build/">Astro</a> blog starter template. This template
-				serves as a lightweight, minimally-styled starting point for anyone looking to build a personal
-				website, blog, or portfolio with Astro.
-			</p>
-			<p>
-				This template comes with a few integrations already configured in your
-				<code>astro.config.mjs</code> file. You can customize your setup with
-				<a href="https://astro.build/integrations">Astro Integrations</a> to add tools like Tailwind,
-				React, or Vue to your project.
-			</p>
-			<p>Here are a few ideas on how to get started with the template:</p>
-			<ul>
-				<li>Edit this page in <code>src/pages/index.astro</code></li>
-				<li>Edit the site header items in <code>src/components/Header.astro</code></li>
-				<li>Add your name to the footer in <code>src/components/Footer.astro</code></li>
-				<li>Check out the included blog posts in <code>src/content/blog/</code></li>
-				<li>Customize the blog post page layout in <code>src/layouts/BlogPost.astro</code></li>
-			</ul>
-			<p>
-				Have fun! If you get stuck, remember to
-				<a href="https://docs.astro.build/">read the docs</a>
-				or <a href="https://astro.build/chat">join us on Discord</a> to ask questions.
-			</p>
-			<p>
-				Looking for a blog template with a bit more personality? Check out
-				<a href="https://github.com/Charca/astro-blog-template">astro-blog-template</a>
-				by <a href="https://twitter.com/Charca">Maxi Ferreira</a>.
-			</p>
-		</main>
-		<Footer />
-	</body>
-</html>
+<BaseLayout title={HOME_TITLE} description={SITE_DESCRIPTION}>
+  <section class="hero">
+    <p class="eyebrow">faizdotid</p>
+    <h1>Hi, I'm Faiz.</h1>
+    <p class="lede">{SITE_DESCRIPTION}</p>
+    <div class="cta">
+      <a class="btn btn-primary" href="/blog">
+        Read the blog
+        <svg
+          viewBox="0 0 24 24"
+          width="18"
+          height="18"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2.2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"></path></svg
+        >
+      </a>
+      <a
+        class="btn btn-ghost"
+        href="https://github.com/faizdotid"
+        target="_blank"
+        rel="noopener">GitHub</a
+      >
+    </div>
+  </section>
+
+  {
+    latest.length > 0 && (
+      <section class="latest">
+        <div class="section-head">
+          <h2>Latest posts</h2>
+          <a class="see-all" href="/blog">
+            View all →
+          </a>
+        </div>
+        <div class="post-list">
+          {latest.map((post) => (
+            <a class="post-row" href={`/blog/${post.id}/`}>
+              {post.data.heroImage && (
+                <div class="thumb">
+                  <Image
+                    width={160}
+                    height={120}
+                    src={post.data.heroImage}
+                    alt=""
+                  />
+                </div>
+              )}
+              <div class="post-meta">
+                <FormattedDate date={post.data.pubDate} />
+                <h3>{post.data.title}</h3>
+                <p>{post.data.description}</p>
+              </div>
+            </a>
+          ))}
+        </div>
+      </section>
+    )
+  }
+</BaseLayout>
+
+<style>
+  .hero {
+    padding: 2rem 0 3.5rem;
+  }
+  .hero h1 {
+    margin: 0.6rem 0 1.2rem;
+    font-size: clamp(2.6rem, 1.9rem + 3.4vw, 4.2rem);
+  }
+  .lede {
+    max-width: 38ch;
+    font-size: var(--step-1);
+    color: var(--text-soft);
+  }
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.8rem;
+    margin-top: 2rem;
+  }
+
+  .section-head {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+  }
+  .section-head h2 {
+    margin: 0;
+  }
+  .see-all {
+    font-weight: 600;
+    font-size: var(--step--1);
+    text-decoration: none;
+    white-space: nowrap;
+  }
+
+  .post-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  .post-row {
+    display: flex;
+    gap: 1.25rem;
+    padding: 1.1rem;
+    border-radius: var(--radius);
+    border: 1px solid transparent;
+    text-decoration: none;
+    color: inherit;
+    transition:
+      background-color 0.2s ease,
+      border-color 0.2s ease,
+      transform 0.2s ease;
+  }
+  .post-row:hover {
+    background: var(--surface);
+    border-color: var(--border);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+  }
+  .thumb {
+    flex-shrink: 0;
+  }
+  .thumb img {
+    width: 120px;
+    height: 90px;
+    object-fit: cover;
+    border-radius: var(--radius-sm);
+  }
+  .post-meta :global(time) {
+    font-size: var(--step--1);
+    font-weight: 500;
+    color: var(--text-muted);
+  }
+  .post-meta h3 {
+    margin: 0.3rem 0;
+    font-size: var(--step-2);
+    transition: color 0.18s ease;
+  }
+  .post-row:hover h3 {
+    color: var(--accent);
+  }
+  .post-meta p {
+    margin: 0;
+    font-size: var(--step-0);
+    color: var(--text-soft);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  @media (max-width: 600px) {
+    .thumb {
+      display: none;
+    }
+    .post-row {
+      padding: 1rem 0.5rem;
+    }
+  }
+</style>
