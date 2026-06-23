@@ -1,0 +1,10 @@
+{
+  "name": "blog-faizdotid-me",
+  "compatibility_date": "2026-01-01",
+  // Serve the static Astro build directly from Workers (no SSR, no adapter).
+  // Images are pre-optimized into ./dist at build time, so /_image is never used.
+  "assets": {
+    "directory": "./dist",
+    "html_handling": "auto-trailing-slash"
+  }
+}
