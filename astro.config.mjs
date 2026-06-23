@@ -4,15 +4,19 @@ import mdx from "@astrojs/mdx";
 import sitemap from "@astrojs/sitemap";
 import { defineConfig, fontProviders } from "astro/config";
 
+import cloudflare from "@astrojs/cloudflare";
+
 // https://astro.build/config
 export default defineConfig({
   site: "https://blog.faizdotid.me/",
   integrations: [mdx(), sitemap()],
+
   markdown: {
     // Drive code highlighting from CSS variables so it follows the
     // monochrome light/dark theme (see --astro-code-* in global.css).
     shikiConfig: { theme: "css-variables" },
   },
+
   fonts: [
     // Body text — matches faizdotid.me.
     // 400 body, 500 UI (nav/eyebrow/buttons/tags), 600 strong & search highlights.
@@ -46,4 +50,6 @@ export default defineConfig({
       subsets: ["latin"],
     },
   ],
+
+  adapter: cloudflare(),
 });
